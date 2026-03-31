@@ -72,7 +72,7 @@ valori_per_posizione_dell_utente_nei_confronti_del_ticket = {
 def estrai_dati_riga(record_riga: str, conteggio):
     """Estrae i dati da una riga e li restituisce come dizionario."""
     if len(record_riga) != LUNGHEZZA_ATTESA:
-        risultato = Result.failure(f'La lunghezza della riga {conteggio} non è valida',
+        risultato = Result.failure(f'La lunghezza della riga {conteggio} non è valida. File C2',
                                    info=f"Attesa: {LUNGHEZZA_ATTESA}, Ricevuta: {len(record_riga)}")
         # display_errore(risultato)
         return risultato

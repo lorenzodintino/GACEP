@@ -2,7 +2,7 @@ import math
 import time
 from pathlib import Path
 from typing import Union
-
+import io
 import pandas as pd
 import streamlit as st
 
@@ -51,7 +51,6 @@ class PaginaControllo(App):
                 time.sleep(10)
                 # st.switch_page(ListaPagine.CARICAMENTO_FILE.page_model.path)
             self.session.switch_page(ListaPagine.CARICAMENTO_FILE)
-
 
     def reset_pagina_corrente(self, tipo_file):
         if tipo_file == 'file_c1':
@@ -107,7 +106,42 @@ class PaginaControllo(App):
 
         st.session_state[tipo_file] = nuova_pagina
 
-
+    def download_excel(self, tipo_file):
+        lista_record = None
+        file_name = None
+        sheet_name = None
+        if tipo_file == 'file_c1':
+            lista_record = self.session.state.files.file_c1
+            file_name = "dati_export_c1.xlsx"
+            sheet_name = "Dati C1"
+        if tipo_file == 'file_c2':
+            lista_record = self.session.state.files.file_c2
+            file_name = "dati_export_c2.xlsx"
+            sheet_name = "Dati C2"
+        if tipo_file == 'file_c3':
+            lista_record = self.session.state.files.file_c3
+            file_name = "dati_export_c3.xlsx"
+            sheet_name = "Dati C3"
+            # st.write(tipo_file)
+            # self.session.state.files.lista_record_c1 = lista_record
+            #
+        df = pd.DataFrame(lista_record)
+        download_excel = "📤 Scarica dati Excel"
+        # file_name = "dati_export_c1.xlsx"
+        with open(file_name, 'wb') as f:
+            with pd.ExcelWriter(f, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name=sheet_name)
+        #
+        st.download_button(
+            label=download_excel,
+            data=open(file_name, 'rb'),
+            file_name=file_name,
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        open(file_name, "wb").close()
+            # print(self.session.state.files.lista_record_c1)
+            # st.write(self.session.state.files.lista_record_c1)
+            # st.stop()
 
     def mostra_tabella_record(self, dati, campi_da_escludere=None):
         if campi_da_escludere is None:
@@ -117,6 +151,8 @@ class PaginaControllo(App):
         df_visualizzato = df_originale.drop(columns=campi_da_escludere)
 
         st.dataframe(df_visualizzato)
+
+
 
     def control_file(self, file_path, _repository: Union[FileC1Repository, FileC2Repository, FileC3Repository]):
         repo = _repository
@@ -389,11 +425,22 @@ class PaginaControllo(App):
         end_index = start_index + righe_per_pagina
         righe_da_mostrare = tutte_le_righe[start_index:end_index]
 
-        st.subheader(f"Visualizzando righe da {start_index + 1} a {min(end_index, totale_righe)}")
+        with st.container(horizontal=True, border=False):
+            st.subheader(f"Visualizzando righe da {start_index + 1} a {min(end_index, totale_righe)}")
+            self.download_excel(tipo_file)
 
         righe_formattate = [riga.dati for riga in righe_da_mostrare]
 
         lista_record = [vars(record) for record in righe_formattate]
+
+
+        if tipo_file == 'file_c1':
+            self.session.state.files.lista_record_c1 = lista_record
+        if tipo_file == 'file_c2':
+            self.session.state.files.lista_record_c2 = lista_record
+        if tipo_file == 'file_c3':
+            self.session.state.files.lista_record_c3 = lista_record
+
 
         self.mostra_tabella_record(lista_record, campi_da_escludere=campi_da_escludere)
 
@@ -412,6 +459,9 @@ class PaginaControllo(App):
                     st.rerun()
 
         dialog()
+
+
+
 
     def show(self):
         risultato_operazione = self.session.state.risultato_operazione
@@ -444,6 +494,9 @@ class PaginaControllo(App):
             st.markdown(f"**Mese:** {self.session.state.files.mese_selezionato}")
 
         if upload_db:
+            if self.session.state.page.is_error:
+                st.error('Errore con i File Caricati')
+                st.stop()
             if self.is_error:
                 st.warning('Il caricamento non può essere eseguito poichè i file non rispettano i controlli')
             else:

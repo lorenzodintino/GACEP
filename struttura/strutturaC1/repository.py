@@ -32,7 +32,7 @@ LUNGHEZZA_ATTESA = 150
 def estrai_dati_riga(record_riga: str, conteggio):
     """Estrae i dati da una riga e li restituisce come dizionario."""
     if len(record_riga) != LUNGHEZZA_ATTESA:
-        risultato = Result.failure(f'La lunghezza della riga {conteggio} non è valida',
+        risultato = Result.failure(f'La lunghezza della riga {conteggio} non è valida. File C1',
                                    info=f"Attesa: {LUNGHEZZA_ATTESA}, Ricevuta: {len(record_riga)}")
         # display_errore(risultato)
         return risultato

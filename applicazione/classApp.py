@@ -92,3 +92,5 @@ class App:
 
         # with st.expander('SESSION'):
         #     st.json(self.session.state)
+        # with st.expander('C1'):
+        #     st.write(self.session.state.files.file_c1)

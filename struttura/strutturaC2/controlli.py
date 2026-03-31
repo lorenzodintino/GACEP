@@ -402,14 +402,14 @@ class ControlloFileC2:
 
 
     def controllo(self):
-        return Result.success('')
+        # return Result.success('')
         for record in self.file:
 
             self._controllo_limite_errori()
             if self.limite_raggiunto:
                 break
             self.record = record
-            print(f"{self.record.get_quota_compartecipazione_alla_spesa} --- {self.record.get_progressivo_riga_per_ricetta} --- {self.record.get_posizione_dell_utente_nei_confronti_del_ticket}")
+            # print(f"{self.record.get_quota_compartecipazione_alla_spesa} --- {self.record.get_progressivo_riga_per_ricetta} --- {self.record.get_posizione_dell_utente_nei_confronti_del_ticket}")
             self.riga += 1
             self.fine_ricetta = self._controllo_se_fine_ricetta()
 

@@ -44,6 +44,9 @@ class FileUploadState(BaseModel):
     file_c1: Optional[FileC1] = None
     file_c2: Optional[FileC2] = None
     file_c3: Optional[FileC3] = None
+    lista_record_c1: Optional[str] = None
+    lista_record_c2: Optional[str] = None
+    lista_record_c3: Optional[str] = None
     upload_c1: Optional[Any] = None
     upload_c2: Optional[Any] = None
     upload_c3: Optional[Any] = None

@@ -30,18 +30,22 @@ class Result:
 
 
 def display_errore(risultato: Result, azione_suggerita:str = ''):
-    @st.dialog("Errore", width="medium", on_dismiss="rerun")
+    st.session_state['app_state'].page.is_error = True
+    @st.dialog("Errore", width="medium", on_dismiss="ignore")
     def show_error(risultato: Result):
         st.error(risultato.errore)
         if risultato.info is not None:
             with st.expander("Info"):
                 st.warning(risultato.info)
+                st.write(st.session_state['app_state'].page.is_error)
 
     if 'loading' in st.session_state and st.session_state['loading']:
         st.session_state['loading'] = False
 
-    show_error(risultato)
 
+
+    # st.rerun()
+    show_error(risultato)
     st.stop()
 
 def display_successo(risultato: Result, azione_suggerita:str = ''):
