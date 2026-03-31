@@ -90,5 +90,5 @@ class App:
 
 
 
-        with st.expander('SESSION'):
-            st.json(self.session.state)
+        # with st.expander('SESSION'):
+        #     st.json(self.session.state)
