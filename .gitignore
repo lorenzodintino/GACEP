@@ -232,3 +232,6 @@ streamlit.log
 
 # File temporanei generati durante lo sviluppo
 *.streamlit.*
+
+
+app.log
