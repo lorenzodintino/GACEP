@@ -235,3 +235,7 @@ streamlit.log
 
 
 app.log
+
+
+.idea/
+.idea
