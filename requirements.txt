@@ -1,0 +1,7 @@
+bcrypt
+mysql-connector-python
+pandas
+pydantic[email]
+pydantic
+pyinstaller
+streamlit
