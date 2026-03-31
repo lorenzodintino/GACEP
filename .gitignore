@@ -206,3 +206,29 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+
+# ==========================================
+# Streamlit specific
+# ==========================================
+
+# Secrets e configurazioni locali (MAI committare le credenziali!)
+.streamlit/secrets.toml
+.streamlit/config.toml
+
+# Cartella di configurazione .streamlit/ intera se non usi config condivise
+# (ma attenzione: se hai config utili per il team, ignora solo secrets.toml)
+.streamlit/
+!.streamlit/config.toml  # scommenta se vuoi versionare config.toml
+
+# File di cache e stato di Streamlit
+streamlit-storage
+*.parquet  # se usi file temporanei per cache dati
+*.pkl      # se usi pickle per caching
+
+# Log file specifici di Streamlit (se configurati)
+streamlit.log
+
+# File temporanei generati durante lo sviluppo
+*.streamlit.*
