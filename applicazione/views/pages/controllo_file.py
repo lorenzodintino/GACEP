@@ -15,7 +15,6 @@ from struttura.strutturaC3 import FileC3Repository, FileC3, ControlloFileC3
 from struttura.strutturaResult import Result, display_errore, display_successo
 
 
-
 class PaginaControllo(App):
     def __init__(self):
         super().__init__()
@@ -89,11 +88,10 @@ class PaginaControllo(App):
 
         st.session_state[tipo_file] = nuova_pagina
 
-
     def decrementa_pagina(self, tipo_file):
         """Callback per il bottone 'Precedente'."""
         # st.session_state[key_sessione_pagina] -= 1
-        nuova_pagina  = 0
+        nuova_pagina = 0
         if tipo_file == 'file_c1':
             self.session.state.files.pagina_corrente_file_c1 -= 1
             nuova_pagina = self.session.state.files.pagina_corrente_file_c1
@@ -125,23 +123,41 @@ class PaginaControllo(App):
             # st.write(tipo_file)
             # self.session.state.files.lista_record_c1 = lista_record
             #
-        df = pd.DataFrame(lista_record)
+
+        # Converti gli oggetti in dizionari
+        # Prima estrai l'attributo .dati da ogni record
+        righe_formattate = [riga.dati for riga in lista_record]
+        # Poi converti ogni oggetto in dizionario usando vars()
+        lista_dizionari = [vars(record) for record in righe_formattate]
+
+        # Crea il DataFrame dai dizionari
+        df = pd.DataFrame(lista_dizionari)
+
+        # Escludi le colonne non desiderate (come fai nella visualizzazione)
+        campi_da_escludere = ['uuid', 'campo_vuoto'] if tipo_file in ['file_c1', 'file_c2'] else ['uuid']
+        df = df.drop(columns=[col for col in campi_da_escludere if col in df.columns])
+
+        # Crea un buffer in memoria invece di scrivere su disco
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name=sheet_name)
+
+        # IMPORTANTE: cerca il buffer all'inizio
+        buffer.seek(0)
+
         download_excel = "📤 Scarica dati Excel"
-        # file_name = "dati_export_c1.xlsx"
-        with open(file_name, 'wb') as f:
-            with pd.ExcelWriter(f, engine='openpyxl') as writer:
-                df.to_excel(writer, index=False, sheet_name=sheet_name)
         #
         st.download_button(
             label=download_excel,
-            data=open(file_name, 'rb'),
+            # data=open(file_name, 'rb'),
+            data=buffer.getvalue(),
             file_name=file_name,
             mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         )
-        open(file_name, "wb").close()
-            # print(self.session.state.files.lista_record_c1)
-            # st.write(self.session.state.files.lista_record_c1)
-            # st.stop()
+        # open(file_name, "wb").close()
+        # print(self.session.state.files.lista_record_c1)
+        # st.write(self.session.state.files.lista_record_c1)
+        # st.stop()
 
     def mostra_tabella_record(self, dati, campi_da_escludere=None):
         if campi_da_escludere is None:
@@ -151,8 +167,6 @@ class PaginaControllo(App):
         df_visualizzato = df_originale.drop(columns=campi_da_escludere)
 
         st.dataframe(df_visualizzato)
-
-
 
     def control_file(self, file_path, _repository: Union[FileC1Repository, FileC2Repository, FileC3Repository]):
         repo = _repository
@@ -180,8 +194,6 @@ class PaginaControllo(App):
 
         file: Union[FileC1, FileC2] = oggetto_result.risultato
         return Result.success(file)
-
-
 
     def render_tab_c1(self, file_path):
 
@@ -279,8 +291,6 @@ class PaginaControllo(App):
 
                     else:
 
-
-
                         self.session.state.page.is_error = False
 
                         st.success("Nessun errore riscontrato durante i controllo del File C2")
@@ -346,8 +356,6 @@ class PaginaControllo(App):
                 tipo_file='file_c3',
                 campi_da_escludere=['uuid']
             )
-
-
 
     def mostra_file_c(self, tipo_file, campi_da_escludere):
         key_session_file = None
@@ -433,7 +441,6 @@ class PaginaControllo(App):
 
         lista_record = [vars(record) for record in righe_formattate]
 
-
         if tipo_file == 'file_c1':
             self.session.state.files.lista_record_c1 = lista_record
         if tipo_file == 'file_c2':
@@ -441,14 +448,11 @@ class PaginaControllo(App):
         if tipo_file == 'file_c3':
             self.session.state.files.lista_record_c3 = lista_record
 
-
         self.mostra_tabella_record(lista_record, campi_da_escludere=campi_da_escludere)
-
-
 
     def mostra_confirm_dialog(self):
         @st.dialog('Conferma di voler procedere', on_dismiss="ignore")
-        def dialog(item = None):
+        def dialog(item=None):
             st.write('Confermi di voler procedere con il caricamento su DataBase?')
             with st.container(horizontal=True, horizontal_alignment="right"):
                 # if st.button('Annulla'):
@@ -459,9 +463,6 @@ class PaginaControllo(App):
                     st.rerun()
 
         dialog()
-
-
-
 
     def show(self):
         risultato_operazione = self.session.state.risultato_operazione
@@ -479,17 +480,19 @@ class PaginaControllo(App):
         if self.session.state.page.show_confirm_modal:
             self.mostra_confirm_dialog()
 
-
         with st.container(horizontal=True, horizontal_alignment="center", vertical_alignment="center"):
             st.header('CONTROLLO')
             if self.session.state.files.upload_su_database:
                 st.info('Upload su DataBase già avvenuto')
             with st.container():
-                upload_db = st.button("Upload su database", type="primary", disabled=self.session.state.files.upload_su_database)
+                upload_db = st.button("Upload su database", type="primary",
+                                      disabled=self.session.state.files.upload_su_database)
 
         with st.container(horizontal=True):
-            st.markdown(f"**Struttura:** {self.session.state.files.nome_struttura_selezionata} | {self.session.state.files.codice_struttura_selezionata}")
-            st.markdown(f"**Prestazione:** {self.session.state.files.nome_prestazione_selezionata} | {self.session.state.files.codice_prestazione_selezionata}")
+            st.markdown(
+                f"**Struttura:** {self.session.state.files.nome_struttura_selezionata} | {self.session.state.files.codice_struttura_selezionata}")
+            st.markdown(
+                f"**Prestazione:** {self.session.state.files.nome_prestazione_selezionata} | {self.session.state.files.codice_prestazione_selezionata}")
             st.markdown(f"**Anno:** {self.session.state.files.anno_selezionato}")
             st.markdown(f"**Mese:** {self.session.state.files.mese_selezionato}")
 
