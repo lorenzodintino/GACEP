@@ -215,12 +215,14 @@ __marimo__/
 
 # Secrets e configurazioni locali (MAI committare le credenziali!)
 .streamlit/secrets.toml
-.streamlit/config.toml
+#.streamlit/config.toml
 
 # Cartella di configurazione .streamlit/ intera se non usi config condivise
 # (ma attenzione: se hai config utili per il team, ignora solo secrets.toml)
-.streamlit/
-!.streamlit/config.toml  # scommenta se vuoi versionare config.toml
+#.streamlit/
+#!.streamlit/config.toml  # scommenta se vuoi versionare config.toml
+
+
 
 # File di cache e stato di Streamlit
 streamlit-storage
