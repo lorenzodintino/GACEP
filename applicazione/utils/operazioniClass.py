@@ -60,10 +60,10 @@ class OperazioniRouter:
                     from applicazione.utils import OperazioneDB
                     self.operazione_db = OperazioneDB()
 
-                    with st.spinner('Svuoto tabelle...'):
-                        self.operazione_db.svuota_tabella(tabella_c1)
-                        self.operazione_db.svuota_tabella(tabella_c2)
-                        self.operazione_db.svuota_tabella(tabella_c3)
+                    # with st.spinner('Svuoto tabelle...'):
+                    #     self.operazione_db.svuota_tabella(tabella_c1)
+                    #     self.operazione_db.svuota_tabella(tabella_c2)
+                    #     self.operazione_db.svuota_tabella(tabella_c3)
 
                     with st.spinner('Upload C1...'):
                         repo = FileC1Repository()

@@ -159,6 +159,24 @@ class PaginaControllo(App):
         # st.write(self.session.state.files.lista_record_c1)
         # st.stop()
 
+    def caricamento_su_db(self):
+
+        disattivato = (self.session.state.files.upload_su_database or self.errore_controllo)
+
+        upload_db = st.button("Upload su database", type="primary",
+                                  disabled=disattivato)
+        if upload_db:
+            if self.session.state.page.is_error:
+                st.error('Errore con i File Caricati')
+                st.stop()
+            if self.is_error:
+                st.warning('Il caricamento non può essere eseguito poichè i file non rispettano i controlli')
+            else:
+                # self.session.state.page.show_confirm_modal = True
+                # st.rerun()
+                self.session.nuova_operazione('CARICAMENTO_SU_DATABASE')
+
+
     def mostra_tabella_record(self, dati, campi_da_escludere=None):
         if campi_da_escludere is None:
             campi_da_escludere = []
@@ -218,6 +236,7 @@ class PaginaControllo(App):
                         self.session.state.page.is_error = True
 
                         if validatore.info == 'LISTA_ERRORI':
+                            self.errore_controllo = True
                             st.error('Errore durante il controllo del file C1')
                             lista_errori = validatore.errore
                             # st.write(lista_errori)
@@ -272,6 +291,7 @@ class PaginaControllo(App):
                         self.session.state.page.is_error = True
 
                         if validatore.info == 'LISTA_ERRORI':
+                            self.errore_controllo = True
                             st.error('Errore durante il controllo del file C2')
                             lista_errori = validatore.errore
                             # st.write(lista_errori)
@@ -327,6 +347,7 @@ class PaginaControllo(App):
                         self.session.state.page.is_error = True
 
                         if validatore.info == 'LISTA_ERRORI':
+                            self.errore_controllo = True
                             st.error('Errore durante il controllo del file C3')
                             lista_errori = validatore.errore
                             # st.write(lista_errori)
@@ -484,9 +505,9 @@ class PaginaControllo(App):
             st.header('CONTROLLO')
             if self.session.state.files.upload_su_database:
                 st.info('Upload su DataBase già avvenuto')
-            with st.container():
-                upload_db = st.button("Upload su database", type="primary",
-                                      disabled=self.session.state.files.upload_su_database)
+            # with st.container():
+            #     upload_db = st.button("Upload su database", type="primary",
+            #                           disabled=self.session.state.files.upload_su_database)
 
         with st.container(horizontal=True):
             st.markdown(
@@ -496,16 +517,16 @@ class PaginaControllo(App):
             st.markdown(f"**Anno:** {self.session.state.files.anno_selezionato}")
             st.markdown(f"**Mese:** {self.session.state.files.mese_selezionato}")
 
-        if upload_db:
-            if self.session.state.page.is_error:
-                st.error('Errore con i File Caricati')
-                st.stop()
-            if self.is_error:
-                st.warning('Il caricamento non può essere eseguito poichè i file non rispettano i controlli')
-            else:
-                # self.session.state.page.show_confirm_modal = True
-                # st.rerun()
-                self.session.nuova_operazione('CARICAMENTO_SU_DATABASE')
+        # if upload_db:
+        #     if self.session.state.page.is_error:
+        #         st.error('Errore con i File Caricati')
+        #         st.stop()
+        #     if self.is_error:
+        #         st.warning('Il caricamento non può essere eseguito poichè i file non rispettano i controlli')
+        #     else:
+        #         # self.session.state.page.show_confirm_modal = True
+        #         # st.rerun()
+        #         self.session.nuova_operazione('CARICAMENTO_SU_DATABASE')
 
         with st.spinner('Caricamento...'):
             tab_1, tab_2, tab_3 = st.tabs(["File C1", "File C2", "File C3"])
@@ -520,6 +541,15 @@ class PaginaControllo(App):
         with tab_3:
             if not self.errore_controllo:
                 self.render_tab_c3(self.percorso_file_c3)
+
+        st.divider()
+        with st.container(horizontal=False, vertical_alignment="center"):
+            st.subheader('Caricamento su DB')
+            st.caption('Da premere 1 sola volta con tutti e 3 i "File C" corretti. Vengono caricati automaticamente sia FileC1, FileC2, FileC3')
+            with st.container(horizontal=True):
+                self.caricamento_su_db()
+                if self.session.state.files.upload_su_database:
+                    st.info('Upload su DataBase già avvenuto')
 
     # def show_test(self):
     #     st.write('pagina controllo file')
