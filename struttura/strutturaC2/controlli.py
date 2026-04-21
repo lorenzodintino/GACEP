@@ -116,7 +116,7 @@ class ControlloFileC2:
             )
             return
         if (self.record.get_posizione_dell_utente_nei_confronti_del_ticket != '01' and 
-            self.record.get_posizione_dell_utente_nei_confronti_del_ticket != '02'):
+            self.record.get_posizione_dell_utente_nei_confronti_del_ticket != '02' and self.fine_ricetta):
             self.lista_errori.append(
                 {
                     "riga": self.riga,
@@ -222,7 +222,7 @@ class ControlloFileC2:
                 }
             )
             return
-        if (self.record.get_quota_compartecipazione_alla_spesa != '0' and
+        if (self.record.get_quota_compartecipazione_alla_spesa != '00000,00' and
              self.record.get_progressivo_riga_per_ricetta != '99'):
             self.lista_errori.append(
                 {
@@ -360,7 +360,9 @@ class ControlloFileC2:
 
     def _controllo_se_fine_ricetta(self):
         if self.record.get_progressivo_riga_per_ricetta == '99':
+            print(f'riga:{self.riga} - SI fine ricetta')
             return True
+        print(f'riga:{self.riga} - NO fine ricetta')
         return False
 
     def _controllo_importo_ticket(self):
@@ -390,7 +392,9 @@ class ControlloFileC2:
     def _controllo_posizione_dell_utente_nei_confronti_del_ticket(self):
         valore = self.record.get_posizione_dell_utente_nei_confronti_del_ticket
         if self.fine_ricetta:
+            #print('SONO IN FINE RICETTA')
             if not valore in valori_per_posizione_dell_utente_nei_confronti_del_ticket:
+                #print(f'valore non in lista: {valore}')
                 self.lista_errori.append(
                     {
                         "riga": self.riga,
@@ -398,6 +402,7 @@ class ControlloFileC2:
                         "valore": valore
                     }
                 )
+            #print(f"valore in lista: {valore}")
         return
 
 
